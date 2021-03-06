@@ -1,0 +1,13 @@
+.phone_box {
+  width: 100%;
+  height: 600px;
+}
+
+.link {
+  opacity: .3;
+}
+
+.title {
+  fill: #fff;
+  font: 600 14px/1 'Rubik', sans-serif;
+}

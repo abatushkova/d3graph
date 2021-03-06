@@ -1,0 +1,112 @@
+{
+  "nodes": [{
+      "name": "Peter",
+      "id": 1,
+      "type": "person"
+    },
+    {
+      "name": "Lois",
+      "id": 2,
+      "type": "person"
+    },
+    {
+      "name": "Stewie",
+      "id": 3,
+      "type": "person"
+    },
+    {
+      "name": "Brian",
+      "id": 4,
+      "type": "person"
+    },
+    {
+      "start": "14:00",
+      "duration": 12,
+      "id": 5,
+      "type": "call"
+    },
+    {
+      "start": "14:00",
+      "duration": 12,
+      "id": 6,
+      "type": "call"
+    },
+    {
+      "start": "14:00",
+      "duration": 12,
+      "id": 7,
+      "type": "call"
+    },
+    {
+      "name": "Glenn",
+      "id": 8,
+      "type": "person"
+    },
+    {
+      "name": "Mag",
+      "id": 9,
+      "type": "person"
+    }
+  ],
+  "relationships": [{
+      "source": 1,
+      "target": 5,
+      "type": "out"
+    },
+    {
+      "source": 2,
+      "target": 5,
+      "type": "out"
+    },
+    {
+      "source": 3,
+      "target": 5,
+      "type": "out"
+    },
+    {
+      "source": 2,
+      "target": 6,
+      "type": "out"
+    },
+    {
+      "source": 4,
+      "target": 6,
+      "type": "out"
+    },
+    {
+      "source": 9,
+      "target": 7,
+      "type": "out"
+    },
+    {
+      "source": 5,
+      "target": 1,
+      "type": "in"
+    },
+    {
+      "source": 5,
+      "target": 2,
+      "type": "in"
+    },
+    {
+      "source": 5,
+      "target": 3,
+      "type": "in"
+    },
+    {
+      "source": 6,
+      "target": 2,
+      "type": "in"
+    },
+    {
+      "source": 6,
+      "target": 4,
+      "type": "in"
+    },
+    {
+      "source": 7,
+      "target": 8,
+      "type": "in"
+    }
+  ]
+}
