@@ -3,11 +3,7 @@
   height: 600px;
 }
 
-.link {
-  opacity: .3;
-}
-
 .title {
-  fill: #fff;
+  fill: #222;
   font: 600 14px/1 'Rubik', sans-serif;
 }

@@ -26,14 +26,14 @@
       "type": "call"
     },
     {
-      "start": "14:00",
-      "duration": 12,
+      "start": "11:25",
+      "duration": 30,
       "id": 6,
       "type": "call"
     },
     {
-      "start": "14:00",
-      "duration": 12,
+      "start": "18:40",
+      "duration": 2,
       "id": 7,
       "type": "call"
     },
@@ -46,36 +46,17 @@
       "name": "Mag",
       "id": 9,
       "type": "person"
+    },
+    {
+      "start": "15:03",
+      "duration": 52,
+      "id": 10,
+      "type": "call"
     }
   ],
   "relationships": [{
-      "source": 1,
-      "target": 5,
-      "type": "out"
-    },
-    {
-      "source": 2,
-      "target": 5,
-      "type": "out"
-    },
-    {
       "source": 3,
       "target": 5,
-      "type": "out"
-    },
-    {
-      "source": 2,
-      "target": 6,
-      "type": "out"
-    },
-    {
-      "source": 4,
-      "target": 6,
-      "type": "out"
-    },
-    {
-      "source": 9,
-      "target": 7,
       "type": "out"
     },
     {
@@ -84,14 +65,19 @@
       "type": "in"
     },
     {
-      "source": 5,
+      "source": 1,
+      "target": 10,
+      "type": "out"
+    },
+    {
+      "source": 10,
       "target": 2,
       "type": "in"
     },
     {
-      "source": 5,
-      "target": 3,
-      "type": "in"
+      "source": 4,
+      "target": 6,
+      "type": "out"
     },
     {
       "source": 6,
@@ -99,14 +85,14 @@
       "type": "in"
     },
     {
-      "source": 6,
-      "target": 4,
+      "source": 8,
+      "target": 7,
       "type": "in"
     },
     {
       "source": 7,
-      "target": 8,
-      "type": "in"
+      "target": 9,
+      "type": "out"
     }
   ]
 }
