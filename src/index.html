@@ -27,9 +27,11 @@
       .append('svg')
         .attr('width', width)
         .attr('height', height)
-        .call(d3.zoom().on('zoom', function() {
+      .call(d3.zoom()
+        .scaleExtent([1, 3])
+        .on('zoom', function() {
           svg.attr('transform', d3.event.transform)
-        }))
+      }))
       .append('g');
 
     d3.json('./summertime_calls.json')
@@ -56,23 +58,25 @@
         .range(['#fff', colors.call]);
 
       const link = svg.selectAll('.link')
-          .data(data.relationships)
+        .data(data.relationships)
         .enter().append('line')
           .attr('class', 'link')
           .attr('stroke', 'rgba(122, 120, 125, .3)');
 
       const node = svg.selectAll('.node')
-          .data(data.nodes)
+        .data(data.nodes)
         .enter().append('g')
-          .attr('class', 'node');
+          .attr('class', 'node')
+        .call(d3.drag()
+          .on('start', dragstarted)
+          .on('drag', dragged)
+          .on('end', dragended)
+        );
 
       node.append('circle')
         .attr('r', d => d.type === 'person' ? 32 : 22)
         .attr('stroke', 'rgba(122, 120, 125, .3)')
-        .style('fill', d => d.type === 'person'
-          ? colors.person
-          : cScale(d.duration)
-        );
+        .style('fill', d => d.type === 'person' ? colors.person : cScale(d.duration));
 
       node.filter(d => d.name)
         .append('text')
@@ -93,9 +97,24 @@
         .attr("transform", d => `translate(${+d.x}, ${+d.y})`);
     }
 
-    function zoomed() {
 
+    function dragstarted() {
+      d3.event.sourceEvent.stopPropagation();
     }
+
+    function dragged(d) {
+      d3.select(this)
+        .style('cursor', 'grab')
+      ticked();
+      //   .attr('x', d3.event.x)
+      //   .attr('y', d3.event.y)
+    }
+
+    function dragended() {
+      d3.select(this)
+        .style('cursor', 'pointer')
+    }
+
   </script>
 </body>
 </html>

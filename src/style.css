@@ -8,3 +8,7 @@
   fill: #222;
   font: 600 14px/1 'Rubik', sans-serif;
 }
+
+.node {
+  cursor: pointer;
+}
