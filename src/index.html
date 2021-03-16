@@ -49,71 +49,75 @@
 
       simulation.nodes(data.nodes);
       simulation.force('link').links(data.relationships);
+
+      function generate(data) {
+        const cNodes = d3.max(data.nodes.filter(node => node.duration));
+        const cScale = d3.scaleLinear()
+          .domain([0, cNodes.duration])
+          .range(['#fff', colors.call]);
+  
+        const link = svg.selectAll('.link')
+          .data(data.relationships)
+          .enter().append('line')
+            .attr('class', 'link')
+            .attr('stroke', 'rgba(122, 120, 125, .3)');
+  
+        const node = svg.selectAll('.node')
+          .data(data.nodes)
+          .enter().append('g')
+            .attr('class', 'node')
+          .call(d3.drag()
+            .on('start', dragstarted)
+            .on('drag', dragged)
+            .on('end', dragended)
+          );
+  
+        node.append('circle')
+          .attr('r', d => d.type === 'person' ? 32 : 22)
+          .attr('stroke', 'rgba(122, 120, 125, .3)')
+          .style('fill', d => d.type === 'person' ? colors.person : cScale(d.duration));
+  
+        node.filter(d => d.name)
+          .append('text')
+            .text(d => d.name)
+            .attr('class', 'title')
+            .attr('text-anchor', 'middle')
+            .attr('dy', '.35em');
+      }
+  
+      function ticked() {
+        d3.selectAll('.link')
+          .attr("x1", d => d.source.x)
+          .attr("y1", d => d.source.y)
+          .attr("x2", d => d.target.x)
+          .attr("y2", d => d.target.y);
+  
+        d3.selectAll('.node')
+          .attr("transform", d => `translate(${+d.x}, ${+d.y})`);
+      }
+  
+  
+      function dragstarted(d) {
+        d.fx = d.x;
+        d.fy = d.y;
+
+        simulation.alphaTarget(0.2).restart();
+      }
+      
+      function dragged(d) {
+        d.fx = d3.event.x;
+        d.fy = d3.event.y;
+        
+      }
+  
+      function dragended(d) {
+        d.fx = null;
+        d.fy = null;
+
+        simulation.alphaTarget(0);
+      }
     }
 
-    function generate(data) {
-      const cNodes = d3.max(data.nodes.filter(node => node.duration));
-      const cScale = d3.scaleLinear()
-        .domain([0, cNodes.duration])
-        .range(['#fff', colors.call]);
-
-      const link = svg.selectAll('.link')
-        .data(data.relationships)
-        .enter().append('line')
-          .attr('class', 'link')
-          .attr('stroke', 'rgba(122, 120, 125, .3)');
-
-      const node = svg.selectAll('.node')
-        .data(data.nodes)
-        .enter().append('g')
-          .attr('class', 'node')
-        .call(d3.drag()
-          .on('start', dragstarted)
-          .on('drag', dragged)
-          .on('end', dragended)
-        );
-
-      node.append('circle')
-        .attr('r', d => d.type === 'person' ? 32 : 22)
-        .attr('stroke', 'rgba(122, 120, 125, .3)')
-        .style('fill', d => d.type === 'person' ? colors.person : cScale(d.duration));
-
-      node.filter(d => d.name)
-        .append('text')
-          .text(d => d.name)
-          .attr('class', 'title')
-          .attr('text-anchor', 'middle')
-          .attr('dy', '.35em');
-    }
-
-    function ticked() {
-      d3.selectAll('.link')
-        .attr("x1", d => d.source.x)
-        .attr("y1", d => d.source.y)
-        .attr("x2", d => d.target.x)
-        .attr("y2", d => d.target.y);
-
-      d3.selectAll('.node')
-        .attr("transform", d => `translate(${+d.x}, ${+d.y})`);
-    }
-
-
-    function dragstarted() {
-      d3.event.sourceEvent.stopPropagation();
-    }
-
-    function dragged(d) {
-      d3.select(this)
-        .style('cursor', 'grab')
-      ticked();
-      //   .attr('x', d3.event.x)
-      //   .attr('y', d3.event.y)
-    }
-
-    function dragended() {
-      d3.select(this)
-        .style('cursor', 'pointer')
-    }
 
   </script>
 </body>
