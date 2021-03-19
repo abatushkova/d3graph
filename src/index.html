@@ -18,15 +18,18 @@
     const width = container.clientWidth;
     const height = container.scrollHeight;
 
-    const colors = {
+    const color = {
       'person': '#d0edf7',
       'call': '#b0ddc7'
+    };
+    const radius = {
+      'person': 32,
+      'call': 22
     };
 
     const svg = d3.select('.phone_box')
       .append('svg')
-        .attr('width', width)
-        .attr('height', height)
+        .attr('viewBox', [0, 0, width, height])
       .call(d3.zoom()
         .scaleExtent([1, 3])
         .on('zoom', function() {
@@ -41,10 +44,10 @@
       generate(data);
 
       const simulation = d3.forceSimulation()
-        .force('charge', d3.forceManyBody().strength(-80))
-        .force('center', d3.forceCenter(width / 2, height / 2))
+        .force('charge', d3.forceManyBody().strength(-150).distanceMin(30).distanceMax(120))
         .force('link', d3.forceLink().id(d => d.id).distance(100))
-        .force("collide", d3.forceCollide().radius(d => d.r + 1))
+        .force('center', d3.forceCenter(width / 2, height / 2))
+        .force("collide", d3.forceCollide().radius(radius.person).strength(0.3))
         .on('tick', ticked);
 
       simulation.nodes(data.nodes);
@@ -54,7 +57,7 @@
         const cNodes = d3.max(data.nodes.filter(node => node.duration));
         const cScale = d3.scaleLinear()
           .domain([0, cNodes.duration])
-          .range(['#fff', colors.call]);
+          .range(['#fff', color.call]);
   
         const link = svg.selectAll('.link')
           .data(data.relationships)
@@ -64,7 +67,7 @@
   
         const node = svg.selectAll('.node')
           .data(data.nodes)
-          .enter().append('g')
+          .join('g')
             .attr('class', 'node')
           .call(d3.drag()
             .on('start', dragstarted)
@@ -73,9 +76,9 @@
           );
   
         node.append('circle')
-          .attr('r', d => d.type === 'person' ? 32 : 22)
+          .attr('r', d => d.type === 'person' ? radius.person : radius.call)
           .attr('stroke', 'rgba(122, 120, 125, .3)')
-          .style('fill', d => d.type === 'person' ? colors.person : cScale(d.duration));
+          .style('fill', d => d.type === 'person' ? color.person : cScale(d.duration));
   
         node.filter(d => d.name)
           .append('text')
@@ -98,23 +101,20 @@
   
   
       function dragstarted(d) {
+        simulation.alphaTarget(0.3).restart();
         d.fx = d.x;
         d.fy = d.y;
-
-        simulation.alphaTarget(0.2).restart();
       }
-      
+
       function dragged(d) {
         d.fx = d3.event.x;
         d.fy = d3.event.y;
-        
       }
-  
+
       function dragended(d) {
+        simulation.alphaTarget(0);
         d.fx = null;
         d.fy = null;
-
-        simulation.alphaTarget(0);
       }
     }
 
