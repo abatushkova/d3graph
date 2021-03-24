@@ -10,5 +10,6 @@
 }
 
 .node {
+  /* display: none; */
   cursor: default;
 }

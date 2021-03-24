@@ -60,8 +60,8 @@
       "type": "out"
     },
     {
-      "source": 5,
-      "target": 1,
+      "source": 1,
+      "target": 5,
       "type": "in"
     },
     {
@@ -70,8 +70,8 @@
       "type": "out"
     },
     {
-      "source": 10,
-      "target": 2,
+      "source": 2,
+      "target": 10,
       "type": "in"
     },
     {
@@ -80,8 +80,8 @@
       "type": "out"
     },
     {
-      "source": 6,
-      "target": 2,
+      "source": 2,
+      "target": 6,
       "type": "in"
     },
     {
@@ -90,8 +90,8 @@
       "type": "in"
     },
     {
-      "source": 7,
-      "target": 9,
+      "source": 9,
+      "target": 7,
       "type": "out"
     }
   ]
