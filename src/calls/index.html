@@ -18,13 +18,14 @@
     const width = container.clientWidth;
     const height = container.scrollHeight;
 
-    const markerBoxWidth = 30;
-    const markerBoxHeight = 30;
+    const markerBoxWidth = 60;
+    const markerBoxHeight = 60;
     const refX = markerBoxWidth;
     const refY = markerBoxHeight / 2;
     const markerWidth = markerBoxWidth / 2;
     const markerHeight = markerBoxHeight / 2;
-    const arrowPoints = [[0, 0], [markerBoxWidth, markerBoxWidth / 2], [0, markerBoxWidth]];
+    const delta = 50;
+    const arrowPoints = [[-delta, 0], [markerBoxWidth - delta, markerBoxWidth / 2], [-delta, markerBoxWidth]];
 
     const color = {
       'person': '#d0edf7',
@@ -33,8 +34,8 @@
       'arrow': 'rgba(122, 120, 125, 1)',
     };
     const radius = {
-      'person': 26,
-      'call': 18,
+      'person': 25,
+      'call': 25,
     };
 
     const svg = d3.select('.phone_box')
@@ -60,7 +61,7 @@
         .attr('stroke', color.arrow)
         .attr('fill', color.arrow);
 
-    d3.json('./summertime_calls.json')
+    d3.json('./data.json')
       .then(build);
 
     function build(data) {
@@ -104,12 +105,19 @@
           .attr('stroke', color.main)
           .style('fill', d => d.type === 'person' ? color.person : cScale(d.duration));
 
-        node.filter(d => d.name)
-          .append('text')
-            .text(d => d.name)
-            .attr('class', 'title')
-            .attr('text-anchor', 'middle')
-            .attr('dy', '.35em');
+        // node.filter(d => d.name)
+        //   .append('text')
+        //     .text(d => d.name)
+        //     .attr('class', 'title')
+        //     .attr('text-anchor', 'middle')
+        //     .attr('dy', '.35em');
+
+        node.append('image')
+          .attr('href', d => d.type === 'person' ? './user.svg' : '')
+          .attr('width', 30)
+          .attr('height', 30)
+          .attr('stroke', '#fff')
+          .attr('transform', 'translate(-15, -15)');
       }
 
       function ticked() {
