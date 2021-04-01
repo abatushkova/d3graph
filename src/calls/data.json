@@ -52,6 +52,38 @@
       "duration": 52,
       "id": 10,
       "type": "call"
+    },
+    {
+      "name": "Chris",
+      "id": 11,
+      "type": "person"
+    },
+    {
+      "name": "Mr. Herbert",
+      "id": 12,
+      "type": "person"
+    },
+    {
+      "name": "Tom",
+      "id": 13,
+      "type": "person"
+    },
+    {
+      "start": "11:16",
+      "duration": 23,
+      "id": 14,
+      "type": "call"
+    },
+    {
+      "start": "20:48",
+      "duration": 37,
+      "id": 15,
+      "type": "call"
+    },
+    {
+      "name": "Carter",
+      "id": 16,
+      "type": "person"
     }
   ],
   "relationships": [{
@@ -92,6 +124,26 @@
     {
       "source": 9,
       "target": 7,
+      "type": "out"
+    },
+    {
+      "source": 11,
+      "target": 14,
+      "type": "in"
+    },
+    {
+      "source": 12,
+      "target": 14,
+      "type": "out"
+    },
+    {
+      "source": 13,
+      "target": 15,
+      "type": "in"
+    },
+    {
+      "source": 16,
+      "target": 15,
       "type": "out"
     }
   ]

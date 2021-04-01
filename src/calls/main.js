@@ -56,10 +56,10 @@ function build(data) {
   generate(data);
 
   const simulation = d3.forceSimulation()
-    .force('charge', d3.forceManyBody().strength(-150).distanceMin(30).distanceMax(120))
+    .force('charge', d3.forceManyBody().strength(-100).distanceMax(radius*8))
     .force('link', d3.forceLink().id(d => d.id).distance(100))
     .force('center', d3.forceCenter(width / 2, height / 2))
-    .force("collide", d3.forceCollide().radius(radius.person).strength(0.3))
+    .force('collide', d3.forceCollide().radius(radius).strength(1).iterations(1))
     .on('tick', ticked);
 
   simulation.nodes(data.nodes);
