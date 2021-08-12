@@ -1,6 +1,7 @@
 const container = document.querySelector('.graph');
 const width = container.clientWidth;
 const height = container.scrollHeight;
+const lineHeight = 18;
 
 const markerBoxWidth = 60;
 const markerBoxHeight = 60;
@@ -102,7 +103,7 @@ function build(data) {
     //     .attr('dy', '.35em');
 
     node.append('circle')
-      .attr('class', 'dash')
+      .attr('class', 'stroke')
       .attr('r', radius + 3)
       .attr('stroke-dasharray', '2')
       .attr('stroke-width', '6');
@@ -147,27 +148,46 @@ function build(data) {
 
   function toggleTooltip(d) {
     const selectedNode = d3.select(this);
+    const nodeProps = d.properties;
+    const tooltipLength = getTooltipLength(nodeProps);
+    const nodePropsLength = Object.keys(nodeProps).length;
+    let tooltip;
+
+    if (!nodeProps) return;
 
     if (selectedNode.classed('active')) {
       selectedNode.classed('active', false)
         .selectAll('.tooltip')
         .remove();
     } else {
-      selectedNode.classed('active', true)
+      tooltip = selectedNode.raise()
+        .classed('active', true)
         .append('g')
-        .attr('class', 'tooltip')
-        .attr('x', 0)
-        .attr('y', -radius)
-        .selectAll('.tooltip__item')
-          .data(d => Object.entries(d.properties))
-          .enter().append('text')
-          .attr('class', 'tooltip__item')
-          .attr('x', 0)
-          .attr('y', 0)
-          .attr('dy', -16)
-          .text(d => `${d[0]} : ${d[1]}`)
-    }
+        .attr('class', 'tooltip');
 
+      tooltip.append('rect')
+        .attr('class', 'tooltip__bg')
+        .attr('width', tooltipLength * 10)
+        .attr('height', lineHeight * nodePropsLength)
+        .attr('transform', 'translate(-4)');
+
+      tooltip.append('text')
+        .selectAll('.tooltip__text')
+        .data(d => Object.entries(nodeProps))
+        .enter().append('tspan')
+          .attr('class', 'tooltip__text')
+          .attr('x', 0)
+          .attr('dy', 16)
+          .text(d => `${d[0]} : ${d[1]}`);
+    }
+  }
+
+  function getTooltipLength(props) {
+    const tooltipLengthList = Object.entries(props)
+      .map((prop) => prop.join('').length)
+      .sort((a, b) => b - a);
+
+    return tooltipLengthList[0];
   }
 }
 

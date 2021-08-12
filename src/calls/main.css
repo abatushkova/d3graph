@@ -9,7 +9,7 @@
   cursor: pointer;
 }
 
-.dash {
+.stroke {
   fill: none;
   stroke: #52bae0;
   opacity: 0;
@@ -17,25 +17,26 @@
   will-change: opacity;
 }
 
-.node:hover .dash {
+.node:hover .stroke {
   opacity: 1;
 }
 
-.node.active .dash {
+.node.active .stroke {
   opacity: .75;
   stroke: #777;
 }
 
 .tooltip {
-  padding: 5px;
-  border: 1px solid #363636;
-  border-radius: 3px;
-  background-color: #fff;
+  transform: translateY(-90px);
+}
+
+.tooltip__bg {
+  fill: #fff;
+  stroke: #363636;
+}
+
+.tooltip__text {
   font: 16px/1 a;
   font-family: inherit;
   color: #363636;
-}
-
-.tooltip__item {
-  display: block;
 }
