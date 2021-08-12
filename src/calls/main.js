@@ -86,7 +86,8 @@ function build(data) {
         .on('start', dragstarted)
         .on('drag', dragged)
         .on('end', dragended)
-      );
+      )
+      .on('click', toggleTooltip);
 
     node.append('circle')
       .attr('r', radius)
@@ -99,6 +100,12 @@ function build(data) {
     //     .attr('class', 'title')
     //     .attr('text-anchor', 'middle')
     //     .attr('dy', '.35em');
+
+    node.append('circle')
+      .attr('class', 'dash')
+      .attr('r', radius + 3)
+      .attr('stroke-dasharray', '2')
+      .attr('stroke-width', '6');
 
     node.append('image')
       .attr('href', d => d.type === 'person' ? './user.svg' : './phone.svg')
@@ -131,6 +138,31 @@ function build(data) {
     simulation.alphaTarget(0);
     d.fx = null;
     d.fy = null;
+  }
+
+  function toggleTooltip(d) {
+    const selectedNode = d3.select(this);
+
+    if (selectedNode.classed('active')) {
+      selectedNode.classed('active', false)
+        .selectAll('.tooltip')
+        .remove();
+    } else {
+      selectedNode.classed('active', true)
+        .append('g')
+        .attr('class', 'tooltip')
+        .attr('x', 0)
+        .attr('y', -radius)
+        .selectAll('.tooltip__item')
+          .data(d => Object.entries(d.properties))
+          .enter().append('text')
+          .attr('class', 'tooltip__item')
+          .attr('x', 0)
+          .attr('y', 0)
+          .attr('dy', -16)
+          .text(d => `${d[0]} : ${d[1]}`)
+    }
+
   }
 }
 
