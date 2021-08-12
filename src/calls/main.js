@@ -101,8 +101,7 @@ function build(data) {
     //     .attr('text-anchor', 'middle')
     //     .attr('dy', '.35em');
 
-    node.filter(d => d.properties)
-      .append('circle')
+    node.append('circle')
       .attr('class', 'dash')
       .attr('r', radius + 3)
       .attr('stroke-dasharray', '2')
@@ -148,30 +147,26 @@ function build(data) {
 
   function toggleTooltip(d) {
     const selectedNode = d3.select(this);
-    console.log(d);
 
     if (selectedNode.classed('active')) {
-      d3.event.stopPropagation();
-
-      console.log('active');
-      selectedNode.selectAll('text.tooltip')
-        .exit().remove();
+      selectedNode.classed('active', false)
+        .selectAll('.tooltip')
+        .remove();
+    } else {
+      selectedNode.classed('active', true)
+        .append('g')
+        .attr('class', 'tooltip')
+        .attr('x', 0)
+        .attr('y', -radius)
+        .selectAll('.tooltip__item')
+          .data(d => Object.entries(d.properties))
+          .enter().append('text')
+          .attr('class', 'tooltip__item')
+          .attr('x', 0)
+          .attr('y', 0)
+          .attr('dy', -16)
+          .text(d => `${d[0]} : ${d[1]}`)
     }
-
-    selectedNode.filter(d => d.properties)
-      .classed('active', !selectedNode.classed('active'))
-
-    selectedNode.select('.tooltip')
-      .data(d)
-      .enter().append('text')
-      .attr('class', 'tooltip')
-      .attr('x', 0)
-      .attr('y', 0)
-      .text(d => Object
-        .entries(d.properties)
-        .map(([key, value]) => `${key} : ${value}`)
-        .join(' ')
-      )
 
   }
 }
