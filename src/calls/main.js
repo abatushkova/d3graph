@@ -13,7 +13,7 @@ const arrowPoints = [[-delta, 0], [markerBoxWidth - delta, markerBoxWidth / 2], 
 
 const radius = 25;
 
-const icon ={
+const icon = {
   'person': './user.svg',
   'call': './phone.svg',
 };
@@ -86,12 +86,13 @@ function build(data) {
         .on('start', dragstarted)
         .on('drag', dragged)
         .on('end', dragended)
-      );
+      )
+      .on('click', toggleTooltip);
 
     node.append('circle')
       .attr('r', radius)
-      // .style('fill', d => d.type === 'person' ? color.person : cScale(d.duration));
       .style('fill', d => d.type === 'person' ? color.person : color.call);
+      // .style('fill', d => d.type === 'person' ? color.person : cScale(d.duration));
 
     // node.filter(d => d.name)
     //   .append('text')
@@ -100,12 +101,21 @@ function build(data) {
     //     .attr('text-anchor', 'middle')
     //     .attr('dy', '.35em');
 
+    node.filter(d => d.properties)
+      .append('circle')
+      .attr('class', 'dash')
+      .attr('r', radius + 3)
+      .attr('stroke-dasharray', '2')
+      .attr('stroke-width', '6');
+
     node.append('image')
       .attr('href', d => d.type === 'person' ? './user.svg' : './phone.svg')
       .attr('width', iconSize)
       .attr('height', iconSize)
       .attr('stroke', '#fff')
       .attr('transform', `translate(-${iconSize / 2}, -${iconSize / 2})`);
+
+    node.exit().remove();
   }
 
   function ticked() {
@@ -114,6 +124,9 @@ function build(data) {
 
     d3.selectAll('.node')
       .attr("transform", d => `translate(${+d.x}, ${+d.y})`);
+
+    d3.selectAll('.tooltip')
+      .exit().remove();
   }
 
   function dragstarted(d) {
@@ -131,6 +144,35 @@ function build(data) {
     simulation.alphaTarget(0);
     d.fx = null;
     d.fy = null;
+  }
+
+  function toggleTooltip(d) {
+    const selectedNode = d3.select(this);
+    console.log(d);
+
+    if (selectedNode.classed('active')) {
+      d3.event.stopPropagation();
+
+      console.log('active');
+      selectedNode.selectAll('text.tooltip')
+        .exit().remove();
+    }
+
+    selectedNode.filter(d => d.properties)
+      .classed('active', !selectedNode.classed('active'))
+
+    selectedNode.select('.tooltip')
+      .data(d)
+      .enter().append('text')
+      .attr('class', 'tooltip')
+      .attr('x', 0)
+      .attr('y', 0)
+      .text(d => Object
+        .entries(d.properties)
+        .map(([key, value]) => `${key} : ${value}`)
+        .join(' ')
+      )
+
   }
 }
 

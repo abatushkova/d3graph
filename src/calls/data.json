@@ -1,23 +1,39 @@
 {
   "nodes": [{
-      "name": "Peter",
       "id": 1,
-      "type": "person"
+      "type": "person",
+      "properties": {
+        "name": "Peter",
+        "number": "918-334-1260",
+        "gender": "Man"
+      }
     },
     {
-      "name": "Lois",
       "id": 2,
-      "type": "person"
+      "type": "person",
+      "properties": {
+        "name": "Lois",
+        "number": "918-334-1260",
+        "gender": "Man"
+      }
     },
     {
-      "name": "Stewie",
       "id": 3,
-      "type": "person"
+      "type": "person",
+      "properties": {
+        "name": "Stewie",
+        "number": "918-334-1260",
+        "gender": "Man"
+      }
     },
     {
-      "name": "Brian",
       "id": 4,
-      "type": "person"
+      "type": "person",
+      "properties": {
+        "name": "Brian",
+        "number": "918-334-1260",
+        "gender": "Man"
+      }
     },
     {
       "start": "14:00",
@@ -38,14 +54,22 @@
       "type": "call"
     },
     {
-      "name": "Glenn",
       "id": 8,
-      "type": "person"
+      "type": "person",
+      "properties": {
+        "name": "Glenn",
+        "number": "918-334-1260",
+        "gender": "Man"
+      }
     },
     {
-      "name": "Mag",
       "id": 9,
-      "type": "person"
+      "type": "person",
+      "properties": {
+        "name": "Mag",
+        "number": "918-334-1260",
+        "gender": "Man"
+      }
     },
     {
       "start": "15:03",
@@ -54,19 +78,31 @@
       "type": "call"
     },
     {
-      "name": "Chris",
       "id": 11,
-      "type": "person"
+      "type": "person",
+      "properties": {
+        "name": "Chris",
+        "number": "918-334-1260",
+        "gender": "Man"
+      }
     },
     {
-      "name": "Mr. Herbert",
       "id": 12,
-      "type": "person"
+      "type": "person",
+      "properties": {
+        "name": "Mr. Herbert",
+        "number": "918-334-1260",
+        "gender": "Man"
+      }
     },
     {
-      "name": "Tom",
       "id": 13,
-      "type": "person"
+      "type": "person",
+      "properties": {
+        "name": "Tom",
+        "number": "918-334-1260",
+        "gender": "Man"
+      }
     },
     {
       "start": "11:16",
@@ -81,9 +117,13 @@
       "type": "call"
     },
     {
-      "name": "Carter",
       "id": 16,
-      "type": "person"
+      "type": "person",
+      "properties": {
+        "name": "Carter",
+        "number": "918-334-1260",
+        "gender": "Man"
+      }
     }
   ],
   "relationships": [{
