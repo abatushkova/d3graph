@@ -1,7 +1,7 @@
 const container = document.querySelector('.graph');
 const width = container.clientWidth;
 const height = container.scrollHeight;
-const lineHeight = 18;
+const lineHeight = 20;
 
 const markerBoxWidth = 60;
 const markerBoxHeight = 60;
@@ -50,17 +50,33 @@ svg.append('defs').append('marker')
     .attr('stroke', color.arrow)
     .attr('fill', color.arrow);
 
+svg.append('defs').append('filter')
+  .attr('id', 'shadow')
+  .append('feDropShadow')
+    .attr('dx', 1)
+    .attr('dy', 1)
+    .attr('stdDeviation', 3)
+    .attr('flood-opacity', '.25');
+
 d3.json('./data.json')
   .then(build);
 
 function build(data) {
   generate(data);
 
+  const linkScale = d3.scaleLinear()
+    .domain([0, 10])
+    .range([0, 16]);
+
   const simulation = d3.forceSimulation()
-    .force('charge', d3.forceManyBody().strength(-100).distanceMax(radius*8))
-    .force('link', d3.forceLink().id(d => d.id).distance(100))
+    .force('charge', d3.forceManyBody().strength(-10))
+    // .force('charge', d3.forceManyBody().strength(-100).distanceMax(radius * 8))
+    .force('link', d3.forceLink().id(d => d.id).distance(100).strength(1))
+    // .force('link', d3.forceLink().id(d => d.id).distance(d => linkScale(d)))
     .force('center', d3.forceCenter(width / 2, height / 2))
-    .force('collide', d3.forceCollide().radius(radius).strength(1).iterations(1))
+    // .force('center', d3.forceCenter(width / 2, height / 2))
+    .force('collide', d3.forceCollide(50))
+    // .force('collide', d3.forceCollide().radius(radius).strength(1).iterations(1))
     .on('tick', ticked);
 
   simulation.nodes(data.nodes);
@@ -105,7 +121,7 @@ function build(data) {
     node.append('circle')
       .attr('class', 'stroke')
       .attr('r', radius + 3)
-      .attr('stroke-dasharray', '2')
+      // .attr('stroke-dasharray', '2')
       .attr('stroke-width', '6');
 
     node.append('image')
@@ -114,8 +130,6 @@ function build(data) {
       .attr('height', iconSize)
       .attr('stroke', '#fff')
       .attr('transform', `translate(-${iconSize / 2}, -${iconSize / 2})`);
-
-    node.exit().remove();
   }
 
   function ticked() {
@@ -124,9 +138,6 @@ function build(data) {
 
     d3.selectAll('.node')
       .attr("transform", d => `translate(${+d.x}, ${+d.y})`);
-
-    d3.selectAll('.tooltip')
-      .exit().remove();
   }
 
   function dragstarted(d) {
@@ -147,13 +158,13 @@ function build(data) {
   }
 
   function toggleTooltip(d) {
+    if (!d.properties) return;
+
     const selectedNode = d3.select(this);
     const nodeProps = d.properties;
     const tooltipLength = getTooltipLength(nodeProps);
     const nodePropsLength = Object.keys(nodeProps).length;
     let tooltip;
-
-    if (!nodeProps) return;
 
     if (selectedNode.classed('active')) {
       selectedNode.classed('active', false)
@@ -167,9 +178,10 @@ function build(data) {
 
       tooltip.append('rect')
         .attr('class', 'tooltip__bg')
-        .attr('width', tooltipLength * 10)
+        .attr('width', tooltipLength * 10 + 10)
         .attr('height', lineHeight * nodePropsLength)
-        .attr('transform', 'translate(-4)');
+        .attr('rx', 2)
+        .style('filter', 'url(#shadow)');
 
       tooltip.append('text')
         .selectAll('.tooltip__text')

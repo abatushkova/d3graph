@@ -11,28 +11,29 @@
 
 .stroke {
   fill: none;
-  stroke: #52bae0;
+  stroke: #0E91CC;
   opacity: 0;
   transition: opacity .1s ease-in-out 0s;
   will-change: opacity;
 }
 
 .node:hover .stroke {
-  opacity: 1;
+  opacity: .5;
 }
 
 .node.active .stroke {
-  opacity: .75;
+  opacity: .5;
   stroke: #777;
 }
 
 .tooltip {
-  transform: translateY(-90px);
+  transform: translate(15px, -75px);
 }
 
 .tooltip__bg {
   fill: #fff;
-  stroke: #363636;
+  /* stroke: #363636; */
+  transform: translate(-8px, -2px);
 }
 
 .tooltip__text {
