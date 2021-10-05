@@ -90,10 +90,21 @@ function build(data) {
 
     const link = svg.selectAll('.link')
       .data(data.relationships)
-      .enter().append('path')
-        .attr('class', 'link')
-        .attr('stroke', color.main)
-        .attr('marker-end', 'url(#arrow)');
+      .join('g')
+        .attr('class', 'link');
+
+    link.append('path')
+      .attr('id', (d, i) => `line_${i}`)
+      .attr('stroke', color.main)
+      .attr('marker-end', 'url(#arrow)');
+
+    link.append('text')
+      .attr('class', 'link__label')
+      .attr('dy', '-.35em')
+      .append('textPath')
+        .attr('xlink:href', (d, i) => `#line_${i}`)
+        .attr('startOffset', '50%')
+        .text(d => d.type);
 
     const node = svg.selectAll('.node')
       .data(data.nodes)
@@ -119,7 +130,7 @@ function build(data) {
     //     .attr('dy', '.35em');
 
     node.append('circle')
-      .attr('class', 'stroke')
+      .attr('class', 'node__stroke')
       .attr('r', radius + 3)
       // .attr('stroke-dasharray', '2')
       .attr('stroke-width', '6');
@@ -133,7 +144,7 @@ function build(data) {
   }
 
   function ticked() {
-    d3.selectAll('.link')
+    d3.selectAll('.link path')
       .attr('d', d => d3.line()([[d.source.x, d.source.y], [d.target.x, d.target.y]]))
 
     d3.selectAll('.node')
@@ -174,7 +185,7 @@ function build(data) {
       tooltip = selectedNode.raise()
         .classed('active', true)
         .append('g')
-        .attr('class', 'tooltip');
+          .attr('class', 'tooltip');
 
       tooltip.append('rect')
         .attr('class', 'tooltip__bg')
