@@ -13,6 +13,7 @@ const delta = 50;
 const arrowPoints = [[-delta, 0], [markerBoxWidth - delta, markerBoxWidth / 2], [-delta, markerBoxWidth]];
 
 const radius = 25;
+const strokeWidth = 3;
 
 const icon = {
   'person': './user.svg',
@@ -64,19 +65,13 @@ d3.json('./data.json')
 function build(data) {
   generate(data);
 
-  const linkScale = d3.scaleLinear()
-    .domain([0, 10])
-    .range([0, 16]);
-
   const simulation = d3.forceSimulation()
-    .force('charge', d3.forceManyBody().strength(-10))
-    // .force('charge', d3.forceManyBody().strength(-100).distanceMax(radius * 8))
-    .force('link', d3.forceLink().id(d => d.id).distance(100).strength(1))
+    .force('charge', d3.forceManyBody().strength(-300).distanceMax(radius * 6))
+    .force('link', d3.forceLink().id(d => d.id).distance(d => data.nodes.length * 10).iterations(1))
     // .force('link', d3.forceLink().id(d => d.id).distance(d => linkScale(d)))
     .force('center', d3.forceCenter(width / 2, height / 2))
-    // .force('center', d3.forceCenter(width / 2, height / 2))
-    .force('collide', d3.forceCollide(50))
-    // .force('collide', d3.forceCollide().radius(radius).strength(1).iterations(1))
+    .force('collide', d3.forceCollide().radius(radius + 10).strength(.3).iterations(1))
+    .alpha(1)
     .on('tick', ticked);
 
   simulation.nodes(data.nodes);
@@ -90,7 +85,7 @@ function build(data) {
 
     const link = svg.selectAll('.link')
       .data(data.relationships)
-      .join('g')
+      .enter().append('g')
         .attr('class', 'link');
 
     link.append('path')
@@ -99,16 +94,16 @@ function build(data) {
       .attr('marker-end', 'url(#arrow)');
 
     link.append('text')
-      .attr('class', 'link__label')
-      .attr('dy', '-.35em')
+      .attr('class', 'link_label')
+      .attr('dy', '4px')
       .append('textPath')
         .attr('xlink:href', (d, i) => `#line_${i}`)
         .attr('startOffset', '50%')
-        .text(d => d.type);
+        .text(d => d.type.toUpperCase());
 
     const node = svg.selectAll('.node')
       .data(data.nodes)
-      .join('g')
+      .enter().append('g')
         .attr('class', 'node')
       .call(d3.drag()
         .on('start', dragstarted)
@@ -130,8 +125,8 @@ function build(data) {
     //     .attr('dy', '.35em');
 
     node.append('circle')
-      .attr('class', 'node__stroke')
-      .attr('r', radius + 3)
+      .attr('class', 'node_stroke')
+      .attr('r', radius + strokeWidth)
       // .attr('stroke-dasharray', '2')
       .attr('stroke-width', '6');
 
@@ -152,7 +147,7 @@ function build(data) {
   }
 
   function dragstarted(d) {
-    simulation.alphaTarget(0.3).restart();
+    if (!d3.event.active) simulation.alphaTarget(0.3);
     d.fx = d.x;
     d.fy = d.y;
   }
@@ -163,7 +158,7 @@ function build(data) {
   }
 
   function dragended(d) {
-    simulation.alphaTarget(0);
+    if (!d3.event.active) simulation.alphaTarget(0).restart();
     d.fx = null;
     d.fy = null;
   }
@@ -185,7 +180,7 @@ function build(data) {
       tooltip = selectedNode.raise()
         .classed('active', true)
         .append('g')
-          .attr('class', 'tooltip');
+          .attr('class', 'tooltip').raise();
 
       tooltip.append('rect')
         .attr('class', 'tooltip__bg')

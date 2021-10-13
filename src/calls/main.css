@@ -9,7 +9,7 @@
   cursor: pointer;
 }
 
-.node__stroke {
+.node_stroke {
   fill: none;
   stroke: #0E91CC;
   opacity: 0;
@@ -17,17 +17,17 @@
   will-change: opacity;
 }
 
-.node:hover .node__stroke {
+.node:hover .node_stroke {
   opacity: .5;
 }
 
-.node.active .node__stroke {
+.node.active .node_stroke {
   opacity: .5;
   stroke: #777;
 }
 
-.link__label {
-  font: 12px/1 a;
+.link_label {
+  font: 10px/1 a;
   font-family: inherit;
   fill: #363636;
   text-anchor: middle;
