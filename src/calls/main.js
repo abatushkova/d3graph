@@ -97,19 +97,11 @@ function build(data) {
 
     label.append('text')
       .attr('class', 'caption_bg')
-      .attr('dy', '.4em')
-      .append('textPath')
-        .attr('xlink:href', (d, i) => `#line_${i}`)
-        .attr('startOffset', '50%')
-        .text(d => d.type.toUpperCase());
+      .call(addLabelText);
 
     label.append('text')
       .attr('class', 'caption')
-      .attr('dy', '.4em')
-      .append('textPath')
-        .attr('xlink:href', (d, i) => `#line_${i}`)
-        .attr('startOffset', '50%')
-        .text(d => d.type.toUpperCase());
+      .call(addLabelText);
 
     const node = svg.selectAll('.node')
       .data(data.nodes)
@@ -171,6 +163,17 @@ function build(data) {
     if (!d3.event.active) simulation.alphaTarget(0);
     d.fx = null;
     d.fy = null;
+  }
+
+  function addLabelText(selection) {
+    const labelText = selection
+      .attr('dy', '.4em')
+      .append('textPath')
+        .attr('xlink:href', (d, i) => `#line_${i}`)
+        .attr('startOffset', '50%')
+        .text(d => d.type.toUpperCase());
+
+    return labelText;
   }
 
   function toggleTooltip(d) {
