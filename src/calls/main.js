@@ -24,7 +24,7 @@ const iconSize = 20;
 const color = {
   'person': '#d0edf7',
   'call': '#b0ddc7',
-  'main': 'rgba(122, 120, 125, .4)',
+  'main': 'rgba(122, 120, 125, .5)',
   'arrow': '#777',
 };
 
@@ -67,10 +67,10 @@ function build(data) {
 
   const simulation = d3.forceSimulation()
     .force('charge', d3.forceManyBody().strength(-300).distanceMax(radius * 6))
-    .force('link', d3.forceLink().id(d => d.id).distance(d => data.nodes.length * 10).iterations(1))
+    .force('link', d3.forceLink().id(d => d.id).distance(100).iterations(1))
     // .force('link', d3.forceLink().id(d => d.id).distance(d => linkScale(d)))
     .force('center', d3.forceCenter(width / 2, height / 2))
-    .force('collide', d3.forceCollide().radius(radius + 10).strength(.3).iterations(1))
+    .force('collide', d3.forceCollide().radius(radius * 2).strength(.3).iterations(1))
     .alpha(1)
     .on('tick', ticked);
 
@@ -93,9 +93,19 @@ function build(data) {
       .attr('stroke', color.main)
       .attr('marker-end', 'url(#arrow)');
 
-    link.append('text')
-      .attr('class', 'link_label')
-      .attr('dy', '4px')
+    const label = link.append('g');
+
+    label.append('text')
+      .attr('class', 'caption_bg')
+      .attr('dy', '.4em')
+      .append('textPath')
+        .attr('xlink:href', (d, i) => `#line_${i}`)
+        .attr('startOffset', '50%')
+        .text(d => d.type.toUpperCase());
+
+    label.append('text')
+      .attr('class', 'caption')
+      .attr('dy', '.4em')
       .append('textPath')
         .attr('xlink:href', (d, i) => `#line_${i}`)
         .attr('startOffset', '50%')
@@ -125,7 +135,7 @@ function build(data) {
     //     .attr('dy', '.35em');
 
     node.append('circle')
-      .attr('class', 'node_stroke')
+      .attr('class', 'stroke')
       .attr('r', radius + strokeWidth)
       // .attr('stroke-dasharray', '2')
       .attr('stroke-width', '6');
@@ -134,7 +144,7 @@ function build(data) {
       .attr('href', d => d.type === 'person' ? './user.svg' : './phone.svg')
       .attr('width', iconSize)
       .attr('height', iconSize)
-      .attr('stroke', '#fff')
+      // .attr('stroke', '#fff')
       .attr('transform', `translate(-${iconSize / 2}, -${iconSize / 2})`);
   }
 
@@ -147,7 +157,7 @@ function build(data) {
   }
 
   function dragstarted(d) {
-    if (!d3.event.active) simulation.alphaTarget(0.3);
+    if (!d3.event.active) simulation.alphaTarget(0.3).restart();
     d.fx = d.x;
     d.fy = d.y;
   }
@@ -158,7 +168,7 @@ function build(data) {
   }
 
   function dragended(d) {
-    if (!d3.event.active) simulation.alphaTarget(0).restart();
+    if (!d3.event.active) simulation.alphaTarget(0);
     d.fx = null;
     d.fy = null;
   }
@@ -206,6 +216,13 @@ function build(data) {
       .sort((a, b) => b - a);
 
     return tooltipLengthList[0];
+  }
+
+  function getLinkLength() {
+    const nodeListLength = data.nodes.length;
+    let linkLength = nodeListLength * 10;
+
+    return linkLength;
   }
 }
 
