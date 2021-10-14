@@ -13,6 +13,7 @@ const delta = 50;
 const arrowPoints = [[-delta, 0], [markerBoxWidth - delta, markerBoxWidth / 2], [-delta, markerBoxWidth]];
 
 const radius = 25;
+const strokeWidth = 3;
 
 const icon = {
   'person': './user.svg',
@@ -23,7 +24,7 @@ const iconSize = 20;
 const color = {
   'person': '#d0edf7',
   'call': '#b0ddc7',
-  'main': 'rgba(122, 120, 125, .4)',
+  'main': 'rgba(122, 120, 125, .5)',
   'arrow': '#777',
 };
 
@@ -64,19 +65,13 @@ d3.json('./data.json')
 function build(data) {
   generate(data);
 
-  const linkScale = d3.scaleLinear()
-    .domain([0, 10])
-    .range([0, 16]);
-
   const simulation = d3.forceSimulation()
-    .force('charge', d3.forceManyBody().strength(-10))
-    // .force('charge', d3.forceManyBody().strength(-100).distanceMax(radius * 8))
-    .force('link', d3.forceLink().id(d => d.id).distance(100).strength(1))
+    .force('charge', d3.forceManyBody().strength(-300).distanceMax(radius * 6))
+    .force('link', d3.forceLink().id(d => d.id).distance(100).iterations(1))
     // .force('link', d3.forceLink().id(d => d.id).distance(d => linkScale(d)))
     .force('center', d3.forceCenter(width / 2, height / 2))
-    // .force('center', d3.forceCenter(width / 2, height / 2))
-    .force('collide', d3.forceCollide(50))
-    // .force('collide', d3.forceCollide().radius(radius).strength(1).iterations(1))
+    .force('collide', d3.forceCollide().radius(radius * 2).strength(.3).iterations(1))
+    .alpha(1)
     .on('tick', ticked);
 
   simulation.nodes(data.nodes);
@@ -90,7 +85,7 @@ function build(data) {
 
     const link = svg.selectAll('.link')
       .data(data.relationships)
-      .join('g')
+      .enter().append('g')
         .attr('class', 'link');
 
     link.append('path')
@@ -98,17 +93,19 @@ function build(data) {
       .attr('stroke', color.main)
       .attr('marker-end', 'url(#arrow)');
 
-    link.append('text')
-      .attr('class', 'link__label')
-      .attr('dy', '-.35em')
-      .append('textPath')
-        .attr('xlink:href', (d, i) => `#line_${i}`)
-        .attr('startOffset', '50%')
-        .text(d => d.type);
+    const label = link.append('g');
+
+    label.append('text')
+      .attr('class', 'caption_bg')
+      .call(addLabelText);
+
+    label.append('text')
+      .attr('class', 'caption')
+      .call(addLabelText);
 
     const node = svg.selectAll('.node')
       .data(data.nodes)
-      .join('g')
+      .enter().append('g')
         .attr('class', 'node')
       .call(d3.drag()
         .on('start', dragstarted)
@@ -130,8 +127,8 @@ function build(data) {
     //     .attr('dy', '.35em');
 
     node.append('circle')
-      .attr('class', 'node__stroke')
-      .attr('r', radius + 3)
+      .attr('class', 'stroke')
+      .attr('r', radius + strokeWidth)
       // .attr('stroke-dasharray', '2')
       .attr('stroke-width', '6');
 
@@ -139,7 +136,7 @@ function build(data) {
       .attr('href', d => d.type === 'person' ? './user.svg' : './phone.svg')
       .attr('width', iconSize)
       .attr('height', iconSize)
-      .attr('stroke', '#fff')
+      // .attr('stroke', '#fff')
       .attr('transform', `translate(-${iconSize / 2}, -${iconSize / 2})`);
   }
 
@@ -152,7 +149,7 @@ function build(data) {
   }
 
   function dragstarted(d) {
-    simulation.alphaTarget(0.3).restart();
+    if (!d3.event.active) simulation.alphaTarget(0.3).restart();
     d.fx = d.x;
     d.fy = d.y;
   }
@@ -163,9 +160,20 @@ function build(data) {
   }
 
   function dragended(d) {
-    simulation.alphaTarget(0);
+    if (!d3.event.active) simulation.alphaTarget(0);
     d.fx = null;
     d.fy = null;
+  }
+
+  function addLabelText(selection) {
+    const labelText = selection
+      .attr('dy', '.4em')
+      .append('textPath')
+        .attr('xlink:href', (d, i) => `#line_${i}`)
+        .attr('startOffset', '50%')
+        .text(d => d.type.toUpperCase());
+
+    return labelText;
   }
 
   function toggleTooltip(d) {
@@ -185,7 +193,7 @@ function build(data) {
       tooltip = selectedNode.raise()
         .classed('active', true)
         .append('g')
-          .attr('class', 'tooltip');
+          .attr('class', 'tooltip').raise();
 
       tooltip.append('rect')
         .attr('class', 'tooltip__bg')
@@ -211,6 +219,13 @@ function build(data) {
       .sort((a, b) => b - a);
 
     return tooltipLengthList[0];
+  }
+
+  function getLinkLength() {
+    const nodeListLength = data.nodes.length;
+    let linkLength = nodeListLength * 10;
+
+    return linkLength;
   }
 }
 
