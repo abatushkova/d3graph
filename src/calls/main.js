@@ -13,7 +13,6 @@ const delta = 50;
 const arrowPoints = [[-delta, 0], [markerBoxWidth - delta, markerBoxWidth / 2], [-delta, markerBoxWidth]];
 
 const radius = 25;
-const strokeWidth = 3;
 
 const icon = {
   'person': './user.svg',
@@ -51,13 +50,45 @@ svg.append('defs').append('marker')
     .attr('stroke', color.arrow)
     .attr('fill', color.arrow);
 
-svg.append('defs').append('filter')
-  .attr('id', 'shadow')
-  .append('feDropShadow')
-    .attr('dx', 1)
-    .attr('dy', 1)
-    .attr('stdDeviation', 3)
-    .attr('flood-opacity', '.25');
+// svg.append('defs').append('filter')
+//   .attr('id', 'shadow')
+//   .append('feDropShadow')
+//     .attr('dx', 1)
+//     .attr('dy', 1)
+//     .attr('stdDeviation', 4)
+//     .attr('flood-opacity', '.25');
+
+const filter = svg.append('defs').append('filter')
+  .attr('id', 'shadow');
+
+filter.append('feGaussianBlur')
+  .attr('in', 'SourceAlpha')
+  .attr('stdDeviation', 4)
+  .attr('result', 'blur');
+
+filter.append('feOffset')
+  .attr('in', 'blur')
+  .attr('dx', 2)
+  .attr('dy', 3)
+  .attr('result', 'offsetBlur');
+
+filter.append('feFlood')
+  .attr('flood-color', 'black')
+  .attr('flood-opacity', .2)
+  .attr('result', 'offsetColor');
+
+filter.append('feComposite')
+  .attr('in', 'offsetColor')
+  .attr('in2', 'offsetBlur')
+  .attr('operator', 'in')
+  .attr('result', 'offsetBlur');
+
+const feMerge = filter.append('feMerge')
+feMerge.append('feMergeNode')
+  .attr('in', 'offsetBlur');
+
+feMerge.append('feMergeNode')
+ .attr('in', 'SourceGraphic');
 
 d3.json('./data.json')
   .then(build);
@@ -65,10 +96,14 @@ d3.json('./data.json')
 function build(data) {
   generate(data);
 
+  const linkScale = d3.scaleLinear()
+    .domain([0, data.nodes.length]) // test with ~1000 nodes
+    .range([10, 100]);
+
   const simulation = d3.forceSimulation()
-    .force('charge', d3.forceManyBody().strength(-300).distanceMax(radius * 6))
-    .force('link', d3.forceLink().id(d => d.id).distance(100).iterations(1))
-    // .force('link', d3.forceLink().id(d => d.id).distance(d => linkScale(d)))
+    .force('charge', d3.forceManyBody().strength(-300).distanceMax(radius * 1))
+    // .force('link', d3.forceLink().id(d => d.id).distance(100).iterations(1))
+    .force('link', d3.forceLink().id(d => d.id).distance(linkScale(data.nodes.length)))
     .force('center', d3.forceCenter(width / 2, height / 2))
     .force('collide', d3.forceCollide().radius(radius * 2).strength(.3).iterations(1))
     .alpha(1)
@@ -128,7 +163,7 @@ function build(data) {
 
     node.append('circle')
       .attr('class', 'stroke')
-      .attr('r', radius + strokeWidth)
+      .attr('r', radius + 3)
       // .attr('stroke-dasharray', '2')
       .attr('stroke-width', '6');
 
@@ -136,7 +171,6 @@ function build(data) {
       .attr('href', d => d.type === 'person' ? './user.svg' : './phone.svg')
       .attr('width', iconSize)
       .attr('height', iconSize)
-      // .attr('stroke', '#fff')
       .attr('transform', `translate(-${iconSize / 2}, -${iconSize / 2})`);
   }
 
@@ -167,7 +201,7 @@ function build(data) {
 
   function addLabelText(selection) {
     const labelText = selection
-      .attr('dy', '.4em')
+      .attr('dy', '.35em')
       .append('textPath')
         .attr('xlink:href', (d, i) => `#line_${i}`)
         .attr('startOffset', '50%')
@@ -177,28 +211,33 @@ function build(data) {
   }
 
   function toggleTooltip(d) {
-    if (!d.properties) return;
+    // if (!d.properties) return;
 
     const selectedNode = d3.select(this);
     const nodeProps = d.properties;
+    nodeProps.type = capitalizeFirstLetter(d.type);
+
     const tooltipLength = getTooltipLength(nodeProps);
     const nodePropsLength = Object.keys(nodeProps).length;
     let tooltip;
 
     if (selectedNode.classed('active')) {
-      selectedNode.classed('active', false)
+      selectedNode.lower().classed('active', false)
         .selectAll('.tooltip')
         .remove();
+
+      svg.selectAll('.link').lower();
     } else {
       tooltip = selectedNode.raise()
         .classed('active', true)
         .append('g')
-          .attr('class', 'tooltip').raise();
+          .attr('class', 'tooltip')
+          .style('transform', `translate(20px, ${-lineHeight * (nodePropsLength + 1)}px)`);
 
       tooltip.append('rect')
         .attr('class', 'tooltip__bg')
         .attr('width', tooltipLength * 10 + 10)
-        .attr('height', lineHeight * nodePropsLength)
+        .attr('height', lineHeight * nodePropsLength + 10)
         .attr('rx', 2)
         .style('filter', 'url(#shadow)');
 
@@ -208,7 +247,7 @@ function build(data) {
         .enter().append('tspan')
           .attr('class', 'tooltip__text')
           .attr('x', 0)
-          .attr('dy', 16)
+          .attr('dy', lineHeight)
           .text(d => `${d[0]} : ${d[1]}`);
     }
   }
@@ -221,11 +260,10 @@ function build(data) {
     return tooltipLengthList[0];
   }
 
-  function getLinkLength() {
-    const nodeListLength = data.nodes.length;
-    let linkLength = nodeListLength * 10;
+  function capitalizeFirstLetter(word) {
+    if (typeof(word) !== 'string' ) return '';
 
-    return linkLength;
+    return word.charAt(0).toUpperCase() + word.slice(1);
   }
 }
 

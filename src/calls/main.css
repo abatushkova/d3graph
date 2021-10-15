@@ -42,13 +42,9 @@
   stroke-width: .8em;
 }
 
-.tooltip {
-  transform: translate(15px, -75px);
-}
-
 .tooltip__bg {
   fill: #fff;
-  transform: translate(-8px, -2px);
+  transform: translate(-10px, 0);
 }
 
 .tooltip__text {
