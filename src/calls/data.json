@@ -5,7 +5,7 @@
     "properties": {
       "name": "Peter",
       "number": "918-334-1260",
-      "gender": "Man"
+      "gender": "man"
     }
   },
   {
@@ -14,7 +14,7 @@
     "properties": {
       "name": "Lois",
       "number": "918-334-1260",
-      "gender": "Man"
+      "gender": "man"
     }
   },
   {
@@ -23,7 +23,7 @@
     "properties": {
       "name": "Stewie",
       "number": "918-334-1260",
-      "gender": "Man"
+      "gender": "man"
     }
   },
   {
@@ -32,7 +32,7 @@
     "properties": {
       "name": "Brian",
       "number": "918-334-1260",
-      "gender": "Man"
+      "gender": "man"
     }
   },
   {
@@ -65,7 +65,7 @@
     "properties": {
       "name": "Glenn",
       "number": "918-334-1260",
-      "gender": "Man"
+      "gender": "man"
     }
   },
   {
@@ -74,7 +74,7 @@
     "properties": {
       "name": "Mag",
       "number": "918-334-1260",
-      "gender": "Man"
+      "gender": "man"
     }
   },
   {
@@ -91,7 +91,7 @@
     "properties": {
       "name": "Chris",
       "number": "918-334-1260",
-      "gender": "Man"
+      "gender": "man"
     }
   },
   {
@@ -100,7 +100,7 @@
     "properties": {
       "name": "Mr. Herbert",
       "number": "918-334-1260",
-      "gender": "Man"
+      "gender": "man"
     }
   },
   {
@@ -109,7 +109,7 @@
     "properties": {
       "name": "Tom",
       "number": "918-334-1260",
-      "gender": "Man"
+      "gender": "man"
     }
   },
   {
@@ -134,7 +134,7 @@
     "properties": {
       "name": "Carter",
       "number": "918-334-1260",
-      "gender": "Man"
+      "gender": "man"
     }
   }
 ],

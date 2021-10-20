@@ -130,13 +130,21 @@ function build(data) {
 
     const label = link.append('g');
 
-    label.append('text')
-      .attr('class', 'caption_bg')
-      .call(addLabelText);
+    // label.append('text')
+    //   .attr('class', 'caption_bg')
+    //   .call(addLabelText);
 
     label.append('text')
       .attr('class', 'caption')
-      .call(addLabelText);
+      .attr('dy', '.35em')
+      .append('textPath')
+        .attr('xlink:href', (d, i) => `#line_${i}`)
+        .attr('startOffset', '50%')
+        .text(d => d.type.toUpperCase())
+
+    label.clone(true).lower()
+      .attr('stroke', '#fff');
+      // .call(addLabelText);
 
     const node = svg.selectAll('.node')
       .data(data.nodes)
@@ -151,7 +159,7 @@ function build(data) {
 
     node.append('circle')
       .attr('r', radius)
-      .style('fill', d => d.type === 'person' ? color.person : color.call);
+      .attr('fill', d => d.type === 'person' ? color.person : color.call);
       // .style('fill', d => d.type === 'person' ? color.person : cScale(d.duration));
 
     // node.filter(d => d.name)
@@ -176,7 +184,7 @@ function build(data) {
 
   function ticked() {
     d3.selectAll('.link path')
-      .attr('d', d => d3.line()([[d.source.x, d.source.y], [d.target.x, d.target.y]]))
+      .attr('d', d => d3.line()([[d.source.x, d.source.y], [d.target.x, d.target.y]]));
 
     d3.selectAll('.node')
       .attr("transform", d => `translate(${+d.x}, ${+d.y})`);
@@ -215,31 +223,30 @@ function build(data) {
 
     const selectedNode = d3.select(this);
     const nodeProps = d.properties;
-    nodeProps.type = capitalizeFirstLetter(d.type);
-
-    const tooltipLength = getTooltipLength(nodeProps);
+    const tooltipLength = getTooltipLength(nodeProps) * 10;
+    const tooltipLabelLength = (d.type.length * 10) + 10;
     const nodePropsLength = Object.keys(nodeProps).length;
-    let tooltip;
 
     if (selectedNode.classed('active')) {
-      selectedNode.lower().classed('active', false)
+      selectedNode.classed('active', false)
         .selectAll('.tooltip')
         .remove();
-
-      svg.selectAll('.link').lower();
     } else {
-      tooltip = selectedNode.raise()
+      const tooltip = selectedNode.raise()
         .classed('active', true)
         .append('g')
           .attr('class', 'tooltip')
-          .style('transform', `translate(20px, ${-lineHeight * (nodePropsLength + 1)}px)`);
+          // .attr('transform', `translate(20, ${-lineHeight * (nodePropsLength + 1)})`);
+          .attr('transform', `translate(0, 0)`);
 
       tooltip.append('rect')
-        .attr('class', 'tooltip__bg')
-        .attr('width', tooltipLength * 10 + 10)
-        .attr('height', lineHeight * nodePropsLength + 10)
-        .attr('rx', 2)
-        .style('filter', 'url(#shadow)');
+        .attr('class', 'tooltip__content')
+        .attr('width', tooltipLength)
+        .attr('height', lineHeight * nodePropsLength)
+        .attr('rx', 4)
+        .attr('stroke', d => d.type === 'person' ? color.person : color.call)
+        .attr('stroke-width', '3')
+        .attr('filter', 'url(#shadow)');
 
       tooltip.append('text')
         .selectAll('.tooltip__text')
@@ -248,8 +255,25 @@ function build(data) {
           .attr('class', 'tooltip__text')
           .attr('x', 0)
           .attr('dy', lineHeight)
-          .text(d => `${d[0]} : ${d[1]}`);
-    }
+          .text(d => `${d[0]} : ${capitalizeFirstLetter(d[1])}`);
+
+      const tooltip_label = tooltip.append('g')
+        .attr('transform', `translate(${(tooltipLength - tooltipLabelLength) / 2}, ${0 - lineHeight / 2})`);
+
+      tooltip_label.append('rect')
+        .attr('width', tooltipLabelLength)
+        .attr('height', lineHeight)
+        .attr('rx', 2)
+        .attr('fill', d => d.type === 'person' ? color.person : color.call);
+
+      tooltip_label.append('text')
+        .attr('class', 'tooltip__text tooltip__name')
+        .attr('x', tooltipLabelLength / 2)
+        .attr('y', lineHeight / 2)
+        .attr('dominant-baseline', 'middle')
+        .attr('text-anchor', 'middle')
+        .text(d => capitalizeFirstLetter(d.type));
+      }
   }
 
   function getTooltipLength(props) {
@@ -261,7 +285,7 @@ function build(data) {
   }
 
   function capitalizeFirstLetter(word) {
-    if (typeof(word) !== 'string' ) return '';
+    if (typeof(word) !== 'string' ) return word;
 
     return word.charAt(0).toUpperCase() + word.slice(1);
   }
