@@ -124,7 +124,7 @@ function build(data) {
         .attr('class', 'link');
 
     link.append('path')
-      .attr('id', (d, i) => `line_${i}`)
+      .attr('id', (d, i) => `path_${i}`)
       .attr('stroke', color.main)
       .attr('marker-end', 'url(#arrow)');
 
@@ -145,6 +145,13 @@ function build(data) {
     label.clone(true).lower()
       .attr('stroke', '#fff');
       // .call(addLabelText);
+    label.append('text')
+      .attr('class', 'link__label_bg')
+      .call(addLabelText);
+
+    label.append('text')
+      .attr('class', 'link__label')
+      .call(addLabelText);
 
     const node = svg.selectAll('.node')
       .data(data.nodes)
@@ -170,7 +177,7 @@ function build(data) {
     //     .attr('dy', '.35em');
 
     node.append('circle')
-      .attr('class', 'stroke')
+      .attr('class', 'node__stroke')
       .attr('r', radius + 3)
       // .attr('stroke-dasharray', '2')
       .attr('stroke-width', '6');
@@ -211,7 +218,7 @@ function build(data) {
     const labelText = selection
       .attr('dy', '.35em')
       .append('textPath')
-        .attr('xlink:href', (d, i) => `#line_${i}`)
+        .attr('xlink:href', (d, i) => `#path_${i}`)
         .attr('startOffset', '50%')
         .text(d => d.type.toUpperCase());
 
