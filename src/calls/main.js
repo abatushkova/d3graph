@@ -130,21 +130,6 @@ function build(data) {
 
     const label = link.append('g');
 
-    // label.append('text')
-    //   .attr('class', 'caption_bg')
-    //   .call(addLabelText);
-
-    label.append('text')
-      .attr('class', 'caption')
-      .attr('dy', '.35em')
-      .append('textPath')
-        .attr('xlink:href', (d, i) => `#line_${i}`)
-        .attr('startOffset', '50%')
-        .text(d => d.type.toUpperCase())
-
-    label.clone(true).lower()
-      .attr('stroke', '#fff');
-      // .call(addLabelText);
     label.append('text')
       .attr('class', 'link__label_bg')
       .call(addLabelText);
@@ -246,7 +231,11 @@ function build(data) {
           // .attr('transform', `translate(20, ${-lineHeight * (nodePropsLength + 1)})`);
           .attr('transform', `translate(0, 0)`);
 
-      tooltip.append('rect')
+      const tooltip_content = tooltip.append('g');
+      const tooltip_label = tooltip.append('g')
+        .attr('transform', `translate(${(tooltipLength - tooltipLabelLength) / 2}, ${0 - lineHeight / 2})`);
+
+      tooltip_content.append('rect')
         .attr('class', 'tooltip__content')
         .attr('width', tooltipLength)
         .attr('height', lineHeight * nodePropsLength)
@@ -255,7 +244,7 @@ function build(data) {
         .attr('stroke-width', '3')
         .attr('filter', 'url(#shadow)');
 
-      tooltip.append('text')
+      tooltip_content.append('text')
         .selectAll('.tooltip__text')
         .data(d => Object.entries(nodeProps))
         .enter().append('tspan')
@@ -263,9 +252,6 @@ function build(data) {
           .attr('x', 0)
           .attr('dy', lineHeight)
           .text(d => `${d[0]} : ${capitalizeFirstLetter(d[1])}`);
-
-      const tooltip_label = tooltip.append('g')
-        .attr('transform', `translate(${(tooltipLength - tooltipLabelLength) / 2}, ${0 - lineHeight / 2})`);
 
       tooltip_label.append('rect')
         .attr('width', tooltipLabelLength)
