@@ -42,14 +42,13 @@
   stroke-width: .8em;
 }
 
-.tooltip__content {
+.tooltip__list {
   fill: #fff;
-  /* transform: translate(-10px, 0); */
-  transform: translate(0, 0);
+  stroke-width: 3;
 }
 
 .tooltip__text {
-  font: 16px/20px a;
+  font: 16px/1 a;
   font-family: inherit;
   color: #363636;
 }

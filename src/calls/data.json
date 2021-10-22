@@ -23,7 +23,8 @@
     "properties": {
       "name": "Stewie",
       "number": "918-334-1260",
-      "gender": "man"
+      "gender": "man",
+      "age": 1
     }
   },
   {
@@ -91,7 +92,8 @@
     "properties": {
       "name": "Chris",
       "number": "918-334-1260",
-      "gender": "man"
+      "gender": "man",
+      "age": 16
     }
   },
   {
