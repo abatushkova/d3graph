@@ -1,7 +1,7 @@
 const container = document.querySelector('.graph');
 const width = container.clientWidth;
 const height = container.scrollHeight;
-const tooltipTextHeight = 25;
+const tooltipTextHeight = 24;
 
 const markerBoxWidth = 60;
 const markerBoxHeight = 60;
@@ -18,7 +18,7 @@ const icon = {
   'person': './user.svg',
   'call': './phone.svg',
 };
-const iconSize = 20;
+const iconSize = radius * .8;
 
 const color = {
   'person': '#d0edf7',
@@ -244,7 +244,7 @@ function build(data) {
 
       tooltip_content.append('text')
         .attr('dy', '.35em')
-        .attr('dominant-baseline', 'middle')
+        .attr('dominant-baseline', 'hanging')
         .attr('transform', `translate(5, 0)`)
         .selectAll('.tooltip__text')
         .data(d => Object.entries(nodeProps))

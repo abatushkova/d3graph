@@ -1,3 +1,7 @@
+body {
+  font-family: 'Rubik', sans-serif;
+}
+
 .graph {
   width: 100%;
   height: 600px;
@@ -26,18 +30,19 @@
   stroke: #777;
 }
 
-.link__label {
-  font: 10px/1 a;
-  font-family: inherit;
-  fill: #111;
-  text-anchor: middle;
-  cursor: default;
-}
-
+.link__label,
 .link__label_bg {
   font: 10px/1 a;
   font-family: inherit;
   text-anchor: middle;
+}
+
+.link__label {
+  fill: #111;
+  cursor: default;
+}
+
+.link__label_bg {
   stroke: #fff;
   stroke-width: .8em;
 }
@@ -48,7 +53,7 @@
 }
 
 .tooltip__text {
-  font: 16px/1 a;
+  font-size: 14px;
   font-family: inherit;
   color: #363636;
 }
