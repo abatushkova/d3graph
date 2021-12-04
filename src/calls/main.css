@@ -1,12 +1,13 @@
 body {
   font-family: 'Rubik', sans-serif;
+  font-size: 16px;
 }
 
 .graph {
   position: relative;
   width: 100%;
   height: 600px;
-  outline: 1px solid #777;
+  outline: 1px solid #000;
   overflow: hidden;
 }
 
@@ -14,8 +15,10 @@ body {
   position: absolute;
   top: calc(50% - 40px);
   right: 10px;
+  z-index: 1;
   border-radius: 4px;
-  box-shadow: 0 2px 6px 0 rgb(0, 0, 0, .2);
+  box-shadow: 0 8px 16px -2px rgba(10 10 10 / 10%), 
+    0 0 0 1px rgb(10 10 10 / 2%);
 }
 
 .zoom__button {
@@ -27,8 +30,14 @@ body {
   border: 0;
   border-radius: 4px;
   outline: 0;
+  color: #4a4a4a;
   background-color: #fff;
   cursor: pointer;
+}
+
+.zoom__button:focus,
+.zoom__button:hover {
+  color: #0a0a0a;
 }
 
 .zoom__in {
@@ -39,6 +48,22 @@ body {
 .zoom__out {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
+}
+
+.zoom_icon {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  vertical-align: middle;
+}
+
+.zoom_icon__body {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+  background: inherit;
+  transform: translateX(0);
 }
 
 .node {
@@ -58,8 +83,8 @@ body {
 }
 
 .node.active .node__stroke {
-  opacity: .5;
-  stroke: #777;
+  opacity: .25;
+  stroke: #0a0a0a;
 }
 
 .link__label,
@@ -70,7 +95,7 @@ body {
 }
 
 .link__label {
-  fill: #111;
+  fill: #0a0a0a;
   cursor: default;
 }
 
@@ -81,15 +106,16 @@ body {
 
 .tooltip__list {
   fill: #fff;
-  stroke-width: 3;
+  stroke-width: 2;
 }
 
 .tooltip__text {
-  font-size: 14px;
+  font: 16px/1 a;
   font-family: inherit;
-  color: #363636;
+  color: #4a4a4a;
 }
 
 .tooltip__name {
   font-weight: bold;
+  color: #363636;
 }

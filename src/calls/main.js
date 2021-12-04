@@ -27,17 +27,27 @@ const color = {
   'arrow': '#777',
 };
 
-const svg = d3.select('.graph')
-  .append('svg')
-    .attr('viewBox', [0, 0, width, height])
-  .call(d3.zoom()
-    .scaleExtent([1, 3])
-    .on('zoom', function() {
-      svg.attr('transform', d3.event.transform)
-  }))
-  .append('g');
+const svg = d3.select('.graph').append('svg')
+  .attr('viewBox', [0, 0, width, height]);
 
-svg.append('defs').append('marker')
+const g = svg.append('g');
+
+const zoom = d3.zoom()
+  .on('zoom', () => g.attr('transform', d3.event.transform));
+
+d3.select('.zoom__in').on('click', () => {
+  zoom.scaleBy(svg.transition().duration(300), 1.5);
+});
+
+d3.select('.zoom__out').on('click', () => {
+  zoom.scaleBy(svg.transition().duration(300), 1 / 1.5);
+});
+
+svg.call(zoom)
+  .on('wheel.zoom', null)
+  .on('dblclick.zoom', null);
+
+g.append('defs').append('marker')
   .attr('id', 'arrow')
   .attr('viewBox', [0, 0, markerBoxWidth, markerBoxHeight])
   .attr('refX', refX)
@@ -50,45 +60,45 @@ svg.append('defs').append('marker')
     .attr('stroke', color.arrow)
     .attr('fill', color.arrow);
 
-// svg.append('defs').append('filter')
-//   .attr('id', 'shadow')
-//   .append('feDropShadow')
-//     .attr('dx', 1)
-//     .attr('dy', 1)
-//     .attr('stdDeviation', 4)
-//     .attr('flood-opacity', '.25');
+g.append('defs').append('filter')
+  .attr('id', 'shadow')
+  .append('feDropShadow')
+    .attr('dx', 0)
+    .attr('dy', 2)
+    .attr('stdDeviation', 2)
+    .attr('flood-opacity', '.1');
 
-const filter = svg.append('defs').append('filter')
-  .attr('id', 'shadow');
+// const filter = g.append('defs').append('filter')
+//   .attr('id', 'shadow');
 
-filter.append('feGaussianBlur')
-  .attr('in', 'SourceAlpha')
-  .attr('stdDeviation', 4)
-  .attr('result', 'blur');
+// filter.append('feGaussianBlur')
+//   .attr('in', 'SourceAlpha')
+//   .attr('stdDeviation', 4)
+//   .attr('result', 'blur');
 
-filter.append('feOffset')
-  .attr('in', 'blur')
-  .attr('dx', 2)
-  .attr('dy', 3)
-  .attr('result', 'offsetBlur');
+// filter.append('feOffset')
+//   .attr('in', 'blur')
+//   .attr('dx', 0)
+//   .attr('dy', 4)
+//   .attr('result', 'offsetBlur');
 
-filter.append('feFlood')
-  .attr('flood-color', 'black')
-  .attr('flood-opacity', .2)
-  .attr('result', 'offsetColor');
+// filter.append('feFlood')
+//   .attr('flood-color', 'black')
+//   .attr('flood-opacity', .1)
+//   .attr('result', 'offsetColor');
 
-filter.append('feComposite')
-  .attr('in', 'offsetColor')
-  .attr('in2', 'offsetBlur')
-  .attr('operator', 'in')
-  .attr('result', 'offsetBlur');
+// filter.append('feComposite')
+//   .attr('in', 'offsetColor')
+//   .attr('in2', 'offsetBlur')
+//   .attr('operator', 'in')
+//   .attr('result', 'offsetBlur');
 
-const feMerge = filter.append('feMerge')
-feMerge.append('feMergeNode')
-  .attr('in', 'offsetBlur');
+// const feMerge = filter.append('feMerge')
+// feMerge.append('feMergeNode')
+//   .attr('in', 'offsetBlur');
 
-feMerge.append('feMergeNode')
- .attr('in', 'SourceGraphic');
+// feMerge.append('feMergeNode')
+//  .attr('in', 'SourceGraphic');
 
 d3.json('./data.json')
   .then(build);
@@ -118,7 +128,7 @@ function build(data) {
     //   .domain([0, cNodes.duration])
     //   .range(['#fff', color.call]);
 
-    const link = svg.selectAll('.link')
+    const link = g.selectAll('.link')
       .data(data.relationships)
       .enter().append('g')
         .attr('class', 'link');
@@ -138,7 +148,7 @@ function build(data) {
       .attr('class', 'link__label')
       .call(addLabelText);
 
-    const node = svg.selectAll('.node')
+    const node = g.selectAll('.node')
       .data(data.nodes)
       .enter().append('g')
         .attr('class', 'node')
@@ -211,13 +221,15 @@ function build(data) {
   }
 
   function toggleTooltip(d) {
-    // if (!d.properties) return;
+    console.log(d);
+    if (!d.properties) return;
 
+    const props = d.properties;
     const selectedNode = d3.select(this);
-    const nodeProps = d.properties;
+    const nodeProps = filterPropsKey(props);
     const tooltipLength = getTooltipLength(nodeProps) * 10;
     const tooltipLabelLength = (d.type.length * 10) + 10;
-    const nodePropsSum = Object.keys(nodeProps).length;
+    const nodePropsTotal = Object.keys(nodeProps).length;
 
     if (selectedNode.classed('active')) {
       selectedNode.classed('active', false)
@@ -232,12 +244,12 @@ function build(data) {
           .attr('filter', 'url(#shadow)');
 
       const tooltip_content = tooltip.append('g')
-        .attr('transform', `translate(0, -${tooltipTextHeight * nodePropsSum})`);
+        .attr('transform', `translate(0, -${tooltipTextHeight * nodePropsTotal})`);
 
       tooltip_content.append('rect')
         .attr('class', 'tooltip__list')
         .attr('width', tooltipLength)
-        .attr('height', tooltipTextHeight * nodePropsSum)
+        .attr('height', tooltipTextHeight * nodePropsTotal)
         .attr('rx', 4)
         .attr('stroke', d => d.type === 'person' ? color.person : color.call);
         // .attr('filter', 'url(#shadow)');
@@ -255,12 +267,12 @@ function build(data) {
           .text(d => `${d[0]} : ${capitalizeFirstLetter(d[1])}`);
 
       const tooltip_label = tooltip.append('g')
-        .attr('transform', `translate(${(tooltipLength - tooltipLabelLength) / 2}, ${-tooltipTextHeight * nodePropsSum - tooltipTextHeight / 2})`);
+        .attr('transform', `translate(${(tooltipLength - tooltipLabelLength) / 2}, ${-tooltipTextHeight * nodePropsTotal - tooltipTextHeight / 2})`);
 
       tooltip_label.append('rect')
         .attr('width', tooltipLabelLength)
         .attr('height', tooltipTextHeight)
-        .attr('rx', 2)
+        .attr('rx', 4)
         .attr('fill', d => d.type === 'person' ? color.person : color.call);
 
       tooltip_label.append('text')
@@ -271,6 +283,12 @@ function build(data) {
         .attr('text-anchor', 'middle')
         .text(d => capitalizeFirstLetter(d.type));
       }
+  }
+
+  function filterPropsKey(props) {
+    return Object.fromEntries(
+      Object.entries(props).filter(([key, value]) => key != 'type' && key != 'key')
+    );
   }
 
   function getTooltipLength(props) {
