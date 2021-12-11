@@ -1,7 +1,7 @@
 const container = document.querySelector('.graph');
 const width = container.clientWidth;
 const height = container.scrollHeight;
-const tooltipTextHeight = 24;
+const tooltipTextHeight = 20;
 
 const markerBoxWidth = 60;
 const markerBoxHeight = 60;
@@ -65,7 +65,7 @@ g.append('defs').append('filter')
   .append('feDropShadow')
     .attr('dx', 0)
     .attr('dy', 2)
-    .attr('stdDeviation', 2)
+    .attr('stdDeviation', 4)
     .attr('flood-opacity', '.1');
 
 // const filter = g.append('defs').append('filter')
@@ -221,15 +221,14 @@ function build(data) {
   }
 
   function toggleTooltip(d) {
-    console.log(d);
     if (!d.properties) return;
 
-    const props = d.properties;
     const selectedNode = d3.select(this);
-    const nodeProps = filterPropsKey(props);
-    const tooltipLength = getTooltipLength(nodeProps) * 10;
-    const tooltipLabelLength = (d.type.length * 10) + 10;
+    const nodeProps = filterPropsKey(d.properties);
     const nodePropsTotal = Object.keys(nodeProps).length;
+
+    const tooltipLength = getTooltipLength(nodeProps) * 10 + 20;
+    const tooltipHeight = tooltipTextHeight * nodePropsTotal + tooltipTextHeight * 2;
 
     if (selectedNode.classed('active')) {
       selectedNode.classed('active', false)
@@ -240,49 +239,44 @@ function build(data) {
         .classed('active', true)
         .append('g')
           .attr('class', 'tooltip')
-          .attr('transform', `translate(12, -12)`)
+          .attr('transform', `translate(12, -${12 + tooltipHeight})`)
           .attr('filter', 'url(#shadow)');
 
-      const tooltip_content = tooltip.append('g')
-        .attr('transform', `translate(0, -${tooltipTextHeight * nodePropsTotal})`);
-
-      tooltip_content.append('rect')
+      tooltip.append('rect')
         .attr('class', 'tooltip__list')
         .attr('width', tooltipLength)
-        .attr('height', tooltipTextHeight * nodePropsTotal)
-        .attr('rx', 4)
+        .attr('height', tooltipHeight)
+        .attr('rx', 4) // add border-radius
         .attr('stroke', d => d.type === 'person' ? color.person : color.call);
-        // .attr('filter', 'url(#shadow)');
 
-      tooltip_content.append('text')
+      tooltip.append('text')
         .attr('dy', '.35em')
-        .attr('dominant-baseline', 'hanging')
-        .attr('transform', `translate(5, 0)`)
+        .attr('dominant-baseline', 'middle')
+        .attr('transform', `translate(8, ${tooltipTextHeight})`)
         .selectAll('.tooltip__text')
         .data(d => Object.entries(nodeProps))
         .enter().append('tspan')
           .attr('class', 'tooltip__text')
           .attr('x', 0)
-          .attr('dy', '1em')
-          .text(d => `${d[0]} : ${capitalizeFirstLetter(d[1])}`);
+          .attr('dy', tooltipTextHeight)
+          .text(d => `${d[0]} : ${d[1]}`);
 
-      const tooltip_label = tooltip.append('g')
-        .attr('transform', `translate(${(tooltipLength - tooltipLabelLength) / 2}, ${-tooltipTextHeight * nodePropsTotal - tooltipTextHeight / 2})`);
+      const tooltip_label = tooltip.append('g');
 
       tooltip_label.append('rect')
-        .attr('width', tooltipLabelLength)
+        .attr('width', tooltipLength)
         .attr('height', tooltipTextHeight)
-        .attr('rx', 4)
+        .attr('rx', 4) // add border-radius
         .attr('fill', d => d.type === 'person' ? color.person : color.call);
 
       tooltip_label.append('text')
         .attr('class', 'tooltip__text tooltip__name')
-        .attr('x', tooltipLabelLength / 2)
+        .attr('x', tooltipLength / 2)
         .attr('y', tooltipTextHeight / 2)
         .attr('dy', '.35em')
         .attr('text-anchor', 'middle')
         .text(d => capitalizeFirstLetter(d.type));
-      }
+    }
   }
 
   function filterPropsKey(props) {
