@@ -1,7 +1,7 @@
-const container = document.querySelector('.graph');
+const container = document.querySelector('.graph_container');
 const width = container.clientWidth;
 const height = container.scrollHeight;
-const tooltipTextHeight = 20;
+const popupTextHeight = 20;
 
 const markerBoxWidth = 60;
 const markerBoxHeight = 60;
@@ -108,12 +108,12 @@ function build(data) {
 
   const linkScale = d3.scaleLinear()
     .domain([0, data.nodes.length]) // test with ~1000 nodes
-    .range([10, 100]);
+    .range([0, data.nodes.length * 10]);
 
   const simulation = d3.forceSimulation()
-    .force('charge', d3.forceManyBody().strength(-300).distanceMax(radius * 1))
-    // .force('link', d3.forceLink().id(d => d.id).distance(100).iterations(1))
-    .force('link', d3.forceLink().id(d => d.id).distance(linkScale(data.nodes.length)))
+    // .force('charge', d3.forceManyBody().strength(-30).distanceMax(radius * 1))
+    .force('charge', d3.forceManyBody().strength(-30))
+    .force('link', d3.forceLink().id(d => d.id).distance(linkScale(10)).strength(.5))
     .force('center', d3.forceCenter(width / 2, height / 2))
     .force('collide', d3.forceCollide().radius(radius * 2).strength(.3).iterations(1))
     .alpha(1)
@@ -157,7 +157,7 @@ function build(data) {
         .on('drag', dragged)
         .on('end', dragended)
       )
-      .on('click', toggleTooltip);
+      .on('click', togglePopup);
 
     node.append('circle')
       .attr('r', radius)
@@ -220,59 +220,64 @@ function build(data) {
     return labelText;
   }
 
-  function toggleTooltip(d) {
+  function togglePopup(d) {
     if (!d.properties) return;
 
     const selectedNode = d3.select(this);
     const nodeProps = filterPropsKey(d.properties);
     const nodePropsTotal = Object.keys(nodeProps).length;
 
-    const tooltipLength = getTooltipLength(nodeProps) * 10 + 20;
-    const tooltipHeight = tooltipTextHeight * nodePropsTotal + tooltipTextHeight * 2;
+    const popupLength = getPopupLength(nodeProps) * 10 + 20;
+    const popupHeight = popupTextHeight * nodePropsTotal + popupTextHeight * 2;
 
     if (selectedNode.classed('active')) {
       selectedNode.classed('active', false)
-        .selectAll('.tooltip')
+        .selectAll('.popup')
         .remove();
+
+      /**
+       * TODO: refactor 'z-index' for node and popup
+       */
+      // svg.selectAll('.link').lower();
     } else {
-      const tooltip = selectedNode.raise()
+      const popup = selectedNode.raise()
         .classed('active', true)
         .append('g')
-          .attr('class', 'tooltip')
-          .attr('transform', `translate(12, -${12 + tooltipHeight})`)
+          .attr('class', 'popup')
+          .attr('transform', `translate(12, -${12 + popupHeight})`)
           .attr('filter', 'url(#shadow)');
 
-      tooltip.append('rect')
-        .attr('class', 'tooltip__list')
-        .attr('width', tooltipLength)
-        .attr('height', tooltipHeight)
+      popup.append('rect')
+        .attr('class', 'popup__list')
+        .attr('width', popupLength)
+        .attr('height', popupHeight)
         .attr('rx', 4) // add border-radius
         .attr('stroke', d => d.type === 'person' ? color.person : color.call);
 
-      tooltip.append('text')
+      popup.append('text')
         .attr('dy', '.35em')
         .attr('dominant-baseline', 'middle')
-        .attr('transform', `translate(8, ${tooltipTextHeight})`)
-        .selectAll('.tooltip__text')
+        .attr('transform', `translate(8, ${popupTextHeight})`)
+        .selectAll('.popup__text')
         .data(d => Object.entries(nodeProps))
         .enter().append('tspan')
-          .attr('class', 'tooltip__text')
+          .attr('class', 'popup__text')
           .attr('x', 0)
-          .attr('dy', tooltipTextHeight)
+          .attr('dy', popupTextHeight)
           .text(d => `${d[0]} : ${d[1]}`);
 
-      const tooltip_label = tooltip.append('g');
+      const popup_label = popup.append('g');
 
-      tooltip_label.append('rect')
-        .attr('width', tooltipLength)
-        .attr('height', tooltipTextHeight)
+      popup_label.append('rect')
+        .attr('width', popupLength)
+        .attr('height', popupTextHeight)
         .attr('rx', 4) // add border-radius
         .attr('fill', d => d.type === 'person' ? color.person : color.call);
 
-      tooltip_label.append('text')
-        .attr('class', 'tooltip__text tooltip__name')
-        .attr('x', tooltipLength / 2)
-        .attr('y', tooltipTextHeight / 2)
+      popup_label.append('text')
+        .attr('class', 'popup__text popup__name')
+        .attr('x', popupLength / 2)
+        .attr('y', popupTextHeight / 2)
         .attr('dy', '.35em')
         .attr('text-anchor', 'middle')
         .text(d => capitalizeFirstLetter(d.type));
@@ -285,12 +290,12 @@ function build(data) {
     );
   }
 
-  function getTooltipLength(props) {
-    const tooltipLengthList = Object.entries(props)
+  function getPopupLength(props) {
+    const popupLengthList = Object.entries(props)
       .map((prop) => prop.join('').length)
       .sort((a, b) => b - a);
 
-    return tooltipLengthList[0];
+    return popupLengthList[0];
   }
 
   function capitalizeFirstLetter(word) {
